@@ -1,0 +1,42 @@
+local chain = require("chain")
+
+describe("chain.range()", function()
+
+    it("should generate numbers from start to finish with default step", function()
+        local result = chain.range(1, 5)
+        expect(result:toList()).to.equal({1, 2, 3, 4, 5})
+    end)
+
+    it("should generate numbers with custom step value", function()
+        local result = chain.range(1, 10, 2)
+        expect(result:toList()).to.equal({1, 3, 5, 7, 9})
+    end)
+
+    it("should work with negative step values", function()
+        local result = chain.range(10, 1, -2)
+        expect(result:toList()).to.equal({10, 8, 6, 4, 2})
+    end)
+
+    it("should return an empty chain when no numbers match the range", function()
+        local result = chain.range(5, 1, 1)
+        expect(result:toList()).to.equal({})
+    end)
+
+    it("should throw an error when step is 0", function()
+        expect(function()
+            chain.range(1, 10, 0)
+        end).to.fail("range(startNum, finishNum, stepNum): stepNum must be a non-zero number or nil (got a zero number: 0)")
+    end)
+
+    it("should throw an error when parameters are not numbers", function()
+        expect(function()
+            chain.range("1", 10)
+        end).to.fail("range(startNum, finishNum, stepNum): startNum must be an integer (got string: '1')")
+        expect(function()
+            chain.range(1, "10")
+        end).to.fail("range(startNum, finishNum, stepNum): finishNum must be an integer (got string: '10')")
+        expect(function()
+            chain.range(1, 10, "2")
+        end).to.fail("range(startNum, finishNum, stepNum): stepNum must be an integer or nil (got string: '2')")
+    end)
+end)

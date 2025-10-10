@@ -1,0 +1,150 @@
+local xtable = require("xtable")
+
+local function _sliceNormalizeIndices(length, s_orig, e_orig, p_orig)
+  -- This internal helper calculates the final 0-based pStart (inclusive),
+  -- end (exclusive), and step values for iteration, mimicking Python's
+  -- slice.indices(length) behavior.
+  local step
+  if p_orig == nil then
+    step = 1
+  else
+    step = p_orig
+  end
+  if step == 0 then
+    -- Level 2 reports error from the perspective of slice's caller.
+    error("slice: slice pStep cannot be zero", 2)
+  end
+  local start_idx, end_idx
+  if step > 0 then
+    -- Handle pStart for step > 0
+    if s_orig == nil then
+      start_idx = 0
+    else
+      start_idx = s_orig
+      if start_idx < 0 then
+        start_idx = start_idx + length
+      end
+      if start_idx < 0 then -- Still negative (e.g., s_orig was -length - k)
+        start_idx = 0
+      elseif start_idx > length then -- Past the end
+        start_idx = length
+      end
+    end
+    -- Handle end for step > 0
+    if e_orig == nil then
+      end_idx = length
+    else
+      end_idx = e_orig
+      if end_idx < 0 then
+        end_idx = end_idx + length
+      end
+      if end_idx < 0 then -- Still negative
+        end_idx = 0
+      elseif end_idx > length then -- Past the end
+        end_idx = length
+      end
+    end
+    -- Ensure end_idx is not less than start_idx for positive step
+    if end_idx < start_idx then
+      end_idx = start_idx
+    end
+  else -- step < 0
+    -- Handle pStart for step < 0
+    if s_orig == nil then
+      start_idx = length - 1
+    else
+      start_idx = s_orig
+      if start_idx < 0 then
+        start_idx = start_idx + length
+      end
+      if start_idx < -1 then -- Clamp very negative to -1
+        start_idx = -1
+      elseif start_idx >= length then -- Clamp very positive to length-1
+        start_idx = length - 1
+      end
+    end
+    -- Handle end for step < 0
+    if e_orig == nil then
+      end_idx = -1 -- Sentinel for "before the beginning"
+    else
+      end_idx = e_orig
+      if end_idx < 0 then
+        end_idx = end_idx + length
+      end
+      if end_idx < -1 then -- Clamp very negative to -1
+        end_idx = -1
+        -- No specific upper clamp like `length-1` for end_idx with negative step.
+        -- Python's behavior: e.g., `arr[3:10:-1]` is empty.
+        -- The `end_idx > start_idx` check below handles this.
+      end
+    end
+    -- Ensure end_idx is not greater than start_idx for negative step
+    if end_idx > start_idx then
+      end_idx = start_idx
+    end
+  end
+  return start_idx, end_idx, step
+end
+
+local function _slice(tbl, pStart, pEnd, pStep, shiftPos)
+  if type(tbl) ~= "table" then
+    error("slice: input 'tbl' must be a table", 2)
+  end
+  if shiftPos ~= 0 and shiftPos ~= 1 then
+    error("slice: 'shiftPos' must be 0 or 1", 2)
+  end
+  local n = #tbl
+  local py_start, py_end -- These will be nil or 0-based integer indices
+  -- Convert input pStart/end to 0-based Python-style nil-or-integer values.
+  -- `pStep` is passed directly to _sliceNormalizeIndices.
+  if shiftPos == 1 then -- Lua 1-based input
+    if pStart ~= nil then
+      if type(pStart) ~= "number" then error("slice: 'pStart' must be a number or nil for shiftPos=1", 2) end
+      if pStart > 0 then
+        py_start = pStart - 1
+      else -- pStart <= 0 (Lua negative indices: -1 is #tbl, etc.)
+        py_start = n + pStart
+      end
+    end -- else py_start remains nil
+    if pEnd ~= nil then
+      if type(pEnd) ~= "number" then error("slice: 'pEnd' must be a number or nil for shiftPos=1", 2) end
+      if pEnd > 0 then
+        -- Lua end X (1-based) means up to element X.
+        -- Python slice end Y (0-based, exclusive) for element at 0-based index X-1 must be X.
+        py_end = pEnd
+      else -- pEnd <= 0 (Lua negative indices)
+        py_end = n + pEnd
+      end
+    end -- else py_end remains nil
+  else -- Python 0-based input
+    if pStart ~= nil and type(pStart) ~= "number" then error("slice: 'pStart' must be a number or nil", 2) end
+    if pEnd ~= nil and type(pEnd) ~= "number" then error("slice: 'pEnd' must be a number or nil", 2) end
+    py_start = pStart
+    py_end = pEnd
+  end
+  if pStep ~= nil and type(pStep) ~= "number" then error("slice: 'pStep' must be a number or nil", 2) end
+  local norm_start, norm_stop, norm_step = _sliceNormalizeIndices(n, py_start, py_end, pStep)
+  local result = {}
+  local current_0_based_idx -- Current 0-based index for iteration
+  local result_insert_idx = 1 -- 1-based index for inserting into Lua result table
+  if norm_step > 0 then
+    current_0_based_idx = norm_start
+    while current_0_based_idx < norm_stop do
+      -- Access tbl using 1-based index from 0-based current_0_based_idx
+      result[result_insert_idx] = tbl[current_0_based_idx + 1]
+      result_insert_idx = result_insert_idx + 1
+      current_0_based_idx = current_0_based_idx + norm_step
+    end
+  elseif norm_step < 0 then
+    current_0_based_idx = norm_start
+    while current_0_based_idx > norm_stop do -- Note: comparison is '>' for negative step
+      result[result_insert_idx] = tbl[current_0_based_idx + 1]
+      result_insert_idx = result_insert_idx + 1
+      current_0_based_idx = current_0_based_idx + norm_step
+    end
+  end
+  -- If norm_step == 0, _sliceNormalizeIndices would have already raised an error.
+  return result
+end
+
+return _slice

@@ -1,0 +1,1 @@
+lua tools/minify.lua minify src/slice.lua > src/slice_min.lua
