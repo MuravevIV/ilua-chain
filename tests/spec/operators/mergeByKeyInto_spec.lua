@@ -106,4 +106,43 @@ describe("Chain:mergeByKeyInto()", function()
 
         expect(heroes.Henry.status).to.equal(nil)
     end)
+
+    it("merges when target is a Chain instance", function()
+        local targetTable = {
+            a = {x = 1},
+            b = {y = 2},
+            c = {z = 3}
+        }
+        local target = chain(targetTable)
+
+        local currentData = {
+            b = {y = 20},
+            d = {w = 4}
+        }
+
+        local result = chain(currentData):mergeByKeyInto(target):toMap()
+
+        expect(result.a.x).to.equal(1)
+        expect(result.b.y).to.equal(20)
+        expect(result.c.z).to.equal(3)
+        expect(result.d.w).to.equal(4)
+
+        local count = 0
+        for _ in pairs(result) do
+            count = count + 1
+        end
+        expect(count).to.equal(4)
+
+        expect(targetTable.b.y).to.equal(2)
+    end)
+
+    it("throws error when target is not table or Chain", function()
+        local currentData = {
+            a = 1
+        }
+
+        expect(function()
+            chain(currentData):mergeByKeyInto("not a table")
+        end).to.fail("target must be a table or Chain instance")
+    end)
 end)
