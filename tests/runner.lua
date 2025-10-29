@@ -50,6 +50,7 @@ else
     'spec/operators/dropFields_spec',
     'spec/operators/filter_spec',
     'spec/operators/filterNot_spec',
+    'spec/operators/filterNotNil_spec',
     'spec/operators/find_spec',
     'spec/operators/findLast_spec',
     'spec/operators/findFirstOrElse_spec',

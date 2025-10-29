@@ -1334,6 +1334,14 @@ function Chain:filterNot(pred)
     end))
 end
 
+--- Filters out nil values from the chain.
+---@return Chain A new Chain without nil elements.
+function Chain:filterNotNil()
+    return Chain.new(self._xt:filter(function(v)
+        return v ~= nil
+    end))
+end
+
 --- Finds the first element satisfying `pred(value, [key, index])`, or returns `nil`.
 --- @param pred function The predicate `function(value, [key, index])`.
 --- @return any The first matching element as `value, [key, index]`, or `nil`.

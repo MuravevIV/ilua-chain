@@ -27,6 +27,7 @@ local files = {
   'src/operators/encapsule.lua',
   'src/operators/filter.lua',
   'src/operators/filterNot.lua',
+  'src/operators/filterNotNil.lua',
   'src/operators/findFirst_.lua',
   'src/operators/findLast_.lua',
   'src/operators/first_.lua',
