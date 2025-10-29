@@ -1630,13 +1630,24 @@ function Chain:mapEntryToFields(fieldKey, fieldValue) -- todo! rename
     return Chain.new(newXt)
 end
 
---- Maps underlying value-tables to shallow copies of themselves.
---- Non-table values are preserved as-is.
---- @return Chain A new Chain object with shallow copies of values that are tables.
-function Chain:shallowCopies()
-    return Chain.new(self._xt:map(function(v)
-        return util.shallowCopy(v)
-    end))
+---@class Chain
+---@field _xt table The internal xtable representation.
+
+--- Merges the key-value pairs from the current Chain into a copy of the target table.
+--- For matching keys, the value from the current Chain overrides the target's value.
+--- The original target table is not modified.
+---@param target table The table to merge into (not modified).
+---@return Chain A new Chain with the merged result.
+function Chain:mergeByKeyInto(target)
+    asserts.is_table(target)
+    local newXt = xtable.new()
+    for k, v in pairs(target) do
+        newXt:insert(k, v)
+    end
+    for _, k, v in self._xt:trios() do
+        newXt:insert(k, v)
+    end
+    return Chain.new(newXt)
 end
 
 -- todo! docs and tests
@@ -1959,6 +1970,15 @@ function Chain:selectFields(fieldsToSelect)
         end
     end
     return Chain.new(coll)
+end
+
+--- Maps underlying value-tables to shallow copies of themselves.
+--- Non-table values are preserved as-is.
+--- @return Chain A new Chain object with shallow copies of values that are tables.
+function Chain:shallowCopies()
+    return Chain.new(self._xt:map(function(v)
+        return util.shallowCopy(v)
+    end))
 end
 
 --- Returns the element if chain has one element, or `nil` if zero or more than one elements.

@@ -32,8 +32,8 @@ local heroesWithStatus = chain(heroes)             -- wrapping collection into a
     :orderBy(function(p) return p.age end)         -- ordering
     :thenBy(function(p, name) return name end)     -- still ordering, second sorting condition
     :take(1)                                       -- slicing
-    :mapToShallowCopy()                            -- protecting from modifications (next operation)
-    :forEach(function(p) p.status = "Chosen" end)  -- modifying (on a shallow copy)
+    :shallowCopies()                               -- protecting from modifications (next operation)
+    :each(function(p) p.status = "Chosen" end)     -- modifying (on a shallow copy)
     :mergeByKeyInto(heroes)                        -- merge (non-modifiable) into original map
     :toMap()                                       -- termination, returning Lua's map-table
 

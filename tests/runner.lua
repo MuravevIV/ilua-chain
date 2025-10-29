@@ -77,6 +77,7 @@ else
     'spec/operators/map_spec',
     'spec/operators/mapEntryToFields_spec',
     'spec/operators/shallowCopies_spec',
+    'spec/operators/mergeByKeyInto_spec',
     'spec/operators/moveFieldToKey_spec',
     'spec/operators/moveKeyToField_spec',
     'spec/operators/order_spec',
