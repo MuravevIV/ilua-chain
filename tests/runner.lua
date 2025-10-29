@@ -90,6 +90,7 @@ else
     'spec/operators/outerJoin_spec',
     'spec/operators/pageCount_spec',
     'spec/operators/pageSlice_spec',
+    'spec/operators/proxyUserdata_spec',
     'spec/operators/reduce_spec',
     'spec/operators/renameFields_spec',
     'spec/operators/rightJoin_spec',

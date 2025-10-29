@@ -58,6 +58,7 @@ local files = {
   'src/operators/pySlice.lua',
   'src/operators/reduce.lua',
   'src/operators/renameFields.lua',
+  'src/operators/proxyUserdata.lua',
   'src/operators/selectFields.lua',
   'src/operators/shallowCopies.lua',
   'src/operators/single_.lua',
