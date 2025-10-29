@@ -41,6 +41,7 @@ else
     'spec/operators/assertCountEquals_spec',
     'spec/operators/assertIsEmpty_spec',
     'spec/operators/assertIsNotEmpty_spec',
+    'spec/operators/assertMultiple_spec',
     'spec/operators/assertSingle_spec',
     'spec/operators/at_spec',
     'spec/operators/copyFieldToKey_spec',
