@@ -77,6 +77,7 @@ else
     'spec/operators/lastOrNil_spec',
     'spec/operators/map_spec',
     'spec/operators/mapEntryToFields_spec',
+    'spec/operators/mkString_spec',
     'spec/operators/shallowCopies_spec',
     'spec/operators/mergeByKeyInto_spec',
     'spec/operators/moveFieldToKey_spec',
