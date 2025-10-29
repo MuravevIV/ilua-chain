@@ -41,6 +41,7 @@ local files = {
   'src/operators/groupBy.lua',
   'src/operators/isEmpty.lua',
   'src/operators/isNotEmpty.lua',
+  'src/operators/join_.lua',
   'src/operators/keys.lua',
   'src/operators/last_.lua',
   'src/operators/luaSlice.lua',

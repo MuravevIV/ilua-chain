@@ -13,7 +13,7 @@ function Chain:selectFields(fieldsToSelect)
     local coll = {}
     for _, element in self._xt:ipairs() do
         if type(element) ~= "table" or util.isArray(element) then
-            table.insert(coll, element)
+            table.insert(coll, element) -- todo! update to xtable
         else
             local newElement = {}
             for _, fieldName in ipairs(fieldsToSelect) do
