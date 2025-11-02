@@ -1092,6 +1092,33 @@ function Chain:any(pred)
     return self._xt:any(pred)
 end
 
+--- Appends an element at the end of the chain, returning a new chain.
+--- If `key` is provided, uses that explicit key (may overwrite if exists).
+--- If no `key`, finds the maximum integer key (if any) and appends with max + 1.
+--- If no integer keys and no explicit key, appends with key 1.
+--- For maps without integer keys, this adds a numeric key, creating a mixed table (unless explicit key provided).
+---@param el any Element to append.
+---@param key any|nil Optional explicit key to use.
+---@return Chain A new Chain object.
+function Chain:append(el, key)
+    local newXt = xtable.new()
+    local maxKey = 0
+    for _, k, v in self._xt:trios() do
+        newXt:insert(k, v)
+        if type(k) == "number" and math.floor(k) == k and k > maxKey then
+            maxKey = k
+        end
+    end
+    local appendKey
+    if key ~= nil then
+        appendKey = key
+    else
+        appendKey = maxKey + 1
+    end
+    newXt:insert(appendKey, el)
+    return Chain.new(newXt)
+end
+
 --- Asserts that chain has at least `n` elements, throws assertion error if not. Returns `self`.
 --- @param n number Minimum expected count.
 --- @param msg string optional - Custom assertion error message.
@@ -2091,6 +2118,19 @@ function Chain:reduce(reducer, initValue)
     return self._xt:reduce(reducer, initValue)
 end
 
+--- Removes all occurrences of `elToRem`, returning new chain.
+---@param elToRem any Element to remove.
+---@return Chain A new Chain object.
+function Chain:remove(elToRem)
+    local newXt = xtable.new()
+    for _, k, v in self._xt:trios() do
+        if v ~= elToRem then
+            newXt:insert(k, v)
+        end
+    end
+    return Chain.new(newXt)
+end
+
 --- For each table element in the chain, creates a new table with specified fields renamed.
 --- Other fields are preserved.
 --- If an element is array-table or not a table - it is passed through unchanged.
@@ -2197,9 +2237,6 @@ function Chain:proxyUserdata()
                 end,
                 __unm = function(a)
                     return -v
-                end,
-                __concat = function(a, b)
-                    return a .. v and b .. v
                 end,
                 __call = function(tbl, ...)
                     return v(...)
