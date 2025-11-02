@@ -93,7 +93,7 @@ local function slice(xt, pStart, pEnd, pStep, shiftPos)
   if shiftPos ~= 0 and shiftPos ~= 1 then
     error("slice: 'shiftPos' must be 0 or 1", 2)
   end
-  local n = #xt
+  local n = xt:len()
   local py_start, py_end -- These will be nil or 0-based integer indices
   -- Convert input pStart/end to 0-based Python-style nil-or-integer values.
   -- `pStep` is passed directly to _sliceNormalizeIndices.

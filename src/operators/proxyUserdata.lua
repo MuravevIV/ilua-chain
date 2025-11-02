@@ -67,9 +67,6 @@ function Chain:proxyUserdata()
                 __unm = function(a)
                     return -v
                 end,
-                __concat = function(a, b)
-                    return a .. v and b .. v
-                end,
                 __call = function(tbl, ...)
                     return v(...)
                 end
