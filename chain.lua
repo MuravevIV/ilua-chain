@@ -472,7 +472,7 @@ local xtable = (function()
     
     function xtable:insert(k, v)
         local existing_iKey = self._nKey_to_iKey[k]
-        if existing_iKey then
+        if existing_iKey ~= nil then
             self._nodes[existing_iKey].value = v
             return existing_iKey
         end
@@ -1182,6 +1182,14 @@ function Chain:assertSingle(msg)
     return self
 end
 
+-- todo! specs
+--- Checks if stream contains `el`.
+--- @param el any Element to search for.
+--- @return boolean True if found.
+function Chain:contains(el)
+    return self:any(function(v) return v == el end)
+end
+
 --- Creates a map by taking each value-table element, using the value of `fieldName` as the new key.
 --- Non-table elements are skipped. Table elements lacking `fieldName` are also skipped.
 --- In case of duplicate keys, the first occurrence takes precedence.
@@ -1498,57 +1506,58 @@ function Chain:getByValueOrNil(key)
     return self._xt:getByValue(key)
 end
 
---- Groups elements based on a key extracted by `keyExtractor(valueElement)`.
---- Returns a Chain with an ordered list of group entries. Each group entry has the form:
---- ```
---- { key = <groupKey>, value = <Chain of all elements sharing groupKey> }
+--- Groups elements based on a key extracted by `keyExtractor(v, k, i)`.
+--- Returns a Chain with an ordered map of group entries. Each group entry has the form:
+--- ```lua
+--- groupKey = { <xtable of all elements sharing groupKey> }
 --- ```
 --- The order of first appearance of each group key is preserved.
 ---
 --- Example:
---- ```
+--- ```lua
 --- local data = {
----   {type = "admin", name = "Alice"},
----   {type = "user",  name = "Bob"},
----   {type = "admin", name = "Charlie"}
+---   { type = "admin", name = "Alice"   },
+---   { type = "user",  name = "Bob"     },
+---   { type = "admin", name = "Charlie" }
 --- }
 ---
 --- local grouped = chain(data)
----     :groupBy(function(valueElement)
----         return valueElement.type
----     end)
----     :toList()
+---     :groupBy(function(v, k, i) return v.type end)
+---     :toMap()
 ---
 --- grouped == {
----   { key = "admin", value = Chain{
+---   admin = {
 ---       {type = "admin", name = "Alice"},
 ---       {type = "admin", name = "Charlie"}
----   }},
----   { key = "user", value = Chain{
+---   },
+---   user = {
 ---       {type = "user", name = "Bob"}
----   }}
+---   }
 --- }
 --- ```
 ---
---- @param keyExtractor function A function receiving an element and returning the group key.
---- @return Chain A new Chain of group entries.
+---@param keyExtractor function A function receiving (value, key, index) and returning the group key.
+---@return Chain A new Chain of group entries.
 function Chain:groupBy(keyExtractor)
-    assert(type(keyExtractor) == "function", "Chain:groupBy: keyExtractor must be a function.")
+    asserts.is_function(keyExtractor)
     local newXt = xtable.new()
     for i, k, v in self._xt:trios() do
         local groupKey = keyExtractor(v, k, i)
         if groupKey ~= nil then
-            local group = newXt:getByNKey(groupKey)
-            if group == nil then
-                newXt:insert(groupKey, {})
-                group = newXt:getByNKey(groupKey)
+            local groupXt = newXt:getByNKey(groupKey)
+            if groupXt == nil then
+                groupXt = xtable.new()
+                newXt:insert(groupKey, groupXt)
             end
-            table.insert(group, v)
+            local elem = groupXt:getByNKey(k)
+            if elem == nil then
+                groupXt:insert(k, v)
+            end
         end
     end
     local finalXt = xtable.new()
-    for _, groupKey, groupValues in newXt:trios() do
-        finalXt:insert(groupKey, groupValues)
+    for _, groupKey, groupXt in newXt:trios() do
+        finalXt:insert(groupKey, Chain.new(groupXt))
     end
     return Chain.new(finalXt)
 end
@@ -2194,8 +2203,7 @@ function Chain:proxyUserdata()
                 end,
                 __call = function(tbl, ...)
                     return v(...)
-                end,
-                __mode = getmetatable(v).__mode
+                end
             })
             newXt:insert(k, wrapper)
         else

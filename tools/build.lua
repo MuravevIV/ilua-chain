@@ -19,6 +19,7 @@ local files = {
   'src/operators/assertIsNotEmpty.lua',
   'src/operators/assertMultiple.lua',
   'src/operators/assertSingle.lua',
+  'src/operators/contains.lua',
   'src/operators/copyFieldToKey.lua',
   'src/operators/copyKeyToField.lua',
   'src/operators/count.lua',

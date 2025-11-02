@@ -72,8 +72,7 @@ function Chain:proxyUserdata()
                 end,
                 __call = function(tbl, ...)
                     return v(...)
-                end,
-                __mode = getmetatable(v).__mode
+                end
             })
             newXt:insert(k, wrapper)
         else

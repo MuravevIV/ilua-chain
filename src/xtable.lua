@@ -12,7 +12,7 @@ end
 
 function xtable:insert(k, v)
     local existing_iKey = self._nKey_to_iKey[k]
-    if existing_iKey then
+    if existing_iKey ~= nil then
         self._nodes[existing_iKey].value = v
         return existing_iKey
     end
