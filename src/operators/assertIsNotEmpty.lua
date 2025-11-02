@@ -5,6 +5,6 @@ local Chain = require("chain_class")
 --- @return Chain The current Chain object.
 function Chain:assertIsNotEmpty(msg)
     local m = msg or "Chain:assertIsNotEmpty failed: The collection is empty."
-    assert(#self._xt > 0, m)
+    assert(self._xt:len() > 0, m)
     return self
 end

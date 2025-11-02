@@ -4,7 +4,7 @@ local Chain = require("chain_class")
 --- @param msg string optional - Custom assertion error message.
 --- @return Chain The current Chain object.
 function Chain:assertIsEmpty(msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "Chain:assertIsEmpty failed: The collection is not empty."
     local ms = string.format("%s (Found %d elements).", m, cnt)
     assert(cnt == 0, ms)

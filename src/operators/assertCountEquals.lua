@@ -5,7 +5,7 @@ local Chain = require("chain_class")
 --- @param msg string optional - Custom assertion error message.
 --- @return Chain The current Chain object.
 function Chain:assertCountEquals(n, msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "Chain:assertCountEquals failed: Expected count of " .. n .. "."
     local ms = string.format("%s (Found %d elements).", m, cnt)
     assert(cnt == n, ms)

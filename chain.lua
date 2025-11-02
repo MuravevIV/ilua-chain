@@ -1097,7 +1097,7 @@ end
 --- @param msg string optional - Custom assertion error message.
 --- @return Chain The current Chain object.
 function Chain:assertCountAtLeast(n, msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "Chain:assertCountAtLeast failed: Expected count of at least " .. n .. "."
     local ms = string.format("%s (Found %d elements).", m, cnt)
     assert(cnt >= n, ms)
@@ -1109,7 +1109,7 @@ end
 --- @param msg string optional - Custom assertion error message.
 --- @return Chain The current Chain object.
 function Chain:assertCountAtMost(n, msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "Chain:assertCountAtMost failed: Expected count of at most " .. n .. "."
     local ms = string.format("%s (Found %d elements).", m, cnt)
     assert(cnt <= n, ms)
@@ -1121,7 +1121,7 @@ end
 --- @param msg string optional - Custom assertion error message.
 --- @return Chain The current Chain object.
 function Chain:assertCountEquals(n, msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "Chain:assertCountEquals failed: Expected count of " .. n .. "."
     local ms = string.format("%s (Found %d elements).", m, cnt)
     assert(cnt == n, ms)
@@ -1144,7 +1144,7 @@ end
 --- @param msg string optional - Custom assertion error message.
 --- @return Chain The current Chain object.
 function Chain:assertIsEmpty(msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "Chain:assertIsEmpty failed: The collection is not empty."
     local ms = string.format("%s (Found %d elements).", m, cnt)
     assert(cnt == 0, ms)
@@ -1156,7 +1156,7 @@ end
 --- @return Chain The current Chain object.
 function Chain:assertIsNotEmpty(msg)
     local m = msg or "Chain:assertIsNotEmpty failed: The collection is empty."
-    assert(#self._xt > 0, m)
+    assert(self._xt:len() > 0, m)
     return self
 end
 
@@ -1164,7 +1164,7 @@ end
 --- @param msg string optional - Custom assertion error message.
 --- @return Chain The current Chain object.
 function Chain:assertMultiple(msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "Chain:assertMultiple failed: Expected more than one element."
     local ms = string.format("%s (Found %d elements).", m, cnt)
     assert(cnt > 1, ms)
@@ -1175,7 +1175,7 @@ end
 --- @param msg string optional - Custom assertion error message.
 --- @return Chain The current Chain object.
 function Chain:assertSingle(msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "Chain:assertSingle failed: Expected exactly one element."
     local ms = string.format("%s (Found %d elements).", m, cnt)
     assert(cnt == 1, ms)
@@ -1269,7 +1269,7 @@ end
 --- Returns number of elements.
 --- @return number Count of elements.
 function Chain:count()
-    return #self._xt
+    return self._xt:len()
 end
 
 -- todo! docs and tests
@@ -1565,13 +1565,13 @@ end
 --- Checks if the chain is empty.
 --- @return boolean True if the chain contains no elements.
 function Chain:isEmpty()
-    return #self._xt == 0
+    return self._xt:len() == 0
 end
 
 --- Checks if the chain is not empty.
 --- @return boolean True if the chain contains one or more elements.
 function Chain:isNotEmpty()
-    return #self._xt > 0
+    return self._xt:len() > 0
 end
 
 local function buildJoinLkMap(strmInst, kExtFn)
@@ -2053,7 +2053,7 @@ function Chain:pageCount(itemsPerPage)
     if itemsPerPage <= 0 then
         return 0
     end
-    local len = #self._xt
+    local len = self._xt:len()
     if len == 0 then
         return 0
     end
@@ -2267,7 +2267,7 @@ end
 --- @param msg string optional - Custom error message.
 --- @return any The single element as `value, [key, index]`.
 function Chain:singleOrError(msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "singleOrError failed: Expected single element."
     local ms = string.format("%s (Found %d elements)", m, cnt)
     return util._orError(ms, self._xt.single, self._xt)

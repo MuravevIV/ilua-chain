@@ -10,7 +10,7 @@ function Chain:pageCount(itemsPerPage)
     if itemsPerPage <= 0 then
         return 0
     end
-    local len = #self._xt
+    local len = self._xt:len()
     if len == 0 then
         return 0
     end

@@ -22,7 +22,7 @@ end
 --- @param msg string optional - Custom error message.
 --- @return any The single element as `value, [key, index]`.
 function Chain:singleOrError(msg)
-    local cnt = #self._xt
+    local cnt = self._xt:len()
     local m = msg or "singleOrError failed: Expected single element."
     local ms = string.format("%s (Found %d elements)", m, cnt)
     return util._orError(ms, self._xt.single, self._xt)
