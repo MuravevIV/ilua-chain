@@ -818,14 +818,14 @@ local xtable = (function()
     end
     
     function xtable:last()
-        local len = #self
+        local len = #self._nodes
         if len > 0 then
             return self:getByIKey(len)
         end
     end
     
     function xtable:single()
-        local len = #self
+        local len = #self._nodes
         if len == 1 then
             return self:getByIKey(1)
         end
